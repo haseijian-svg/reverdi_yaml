@@ -1,6 +1,0 @@
-apiVersion: v2
-name: reverdi-app
-description: Reverdi Luxury Platform Helm Chart for CloudeDX
-type: application
-version: 0.1.0
-appVersion: "1.0.0"
