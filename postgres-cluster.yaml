@@ -1,0 +1,29 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: reverdi-db
+  namespace: reluxe
+spec:
+  instances: 3
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.2
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 10Gi
+  bootstrap:
+    initdb:
+      database: reverdi
+      owner: reverdi_user
+      secret:
+        name: reverdi-db-credentials
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: postgresql.cnpg.io/cluster
+                  operator: In
+                  values:
+                    - reverdi-db
+            topologyKey: "topology.kubernetes.io/zone"

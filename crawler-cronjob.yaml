@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "reverdi.fullname" . }}-crawler
+  labels:
+    {{- include "reverdi.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.cronjobs.crawler.schedule | quote }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          nodeSelector:
+            {{- toYaml .Values.nodeSelector.batch | nindent 12 }}
+          restartPolicy: OnFailure
+          containers:
+            - name: crawler
+              image: {{ .Values.cronjobs.crawler.image }}
+              envFrom:
+                - secretRef:
+                    name: {{ include "reverdi.fullname" . }}-secret
+              volumeMounts:
+                - mountPath: /dev/shm
+                  name: dshm
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
